@@ -24,56 +24,57 @@ ma_depth(x_test, data_test, 0)
 # p_value function 
 p_value <- function(lower_bd, upper_bd, t_init, seeds, G, s_obs, T_stat = ma_depth){
   # extract the number of seeds R
-  dimensions <- dim(seeds)
-  R <- dimensions[1]
-  d <- dimensions[2]
+  R <- dim(seeds)[1]
+  d <- length(s_obs)
   
   # a function that generate R simulated values using the seeds and G, store s_obs and s_sim in an R+1 by d matrix
   s <- function(theta){
-    s_values <- matrix(s_obs, 
-                       nrow = R+1, 
-                       ncol = d, 
-                       byrow = TRUE)
-    for(i in 1:R){
-      s_values[i,] <- G(seeds[i-1,], theta)
-    }
+    s_values <- rbind(s_obs, G(seeds, theta))
+    return(s_values)
   }
   
   # function that computes and stores the simulated statistics using T_stat
   statistics <- function(theta){
-    t_vec <- T_stat(s(theta), s(theta), theta)
+    s_matrix <- s(theta)
+    t_vec <- T_stat(s_matrix, s_matrix, theta)
   }
   
   # define the counting function that we feed into optim
   count <- function(theta){
-    s_values <- s(theta)
-    t_values <- statistics(s_values, s_values, theta)
+    t_values <- statistics(theta)
     ct <- sum(t_values[-1] <= t_values[1]) + t_values[1]
     return(-ct)
   }
   
   # finding the largest 
-  max <- -optim(par = t_init, 
-                fn = count,
-                lower = lower_bd,
-                uppper = upper_bd)$value
+  opt <- optim(par = t_init, 
+               fn = count,
+               lower = lower_bd,
+               uppper = upper_bd)
+  max <- -opt$value
+  theta_hat <- opt$par
   
   # compute the p value and return
   p_val <- 1/(R+1) * min(floor(max)+1, R+1)
-  return(p_val)
+  
+  # compile a list of values to return
+  results <- list(p_val = p_val,
+                  rank = floor(max)+1,
+                  theta_hat = theta_hat)
+  
+  return(results)
 }
 
 
 
 # accept function
 accept <- function(alpha, lower_bd, upper_bd, t_init, seeds, G, s_obs, T_stat = ma_depth){
-  p_val <- p_value(lower_bd, upper_bd, t_init, seeds, G, s_obs, T_stat = ma_depth)
+  # calling the p_value function as a subroutine
+  p_val <- p_value(lower_bd, upper_bd, t_init, seeds, G, s_obs, T_stat = ma_depth)$p_val
   
   # return true if we fail to reject
   return(p_val > alpha)
 }
-
-
 
 
 
