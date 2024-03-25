@@ -51,15 +51,15 @@ p_value <- function(lower_bd, upper_bd, t_init, seeds, G, s_obs, T_stat = ma_dep
                fn = count,
                lower = lower_bd,
                uppper = upper_bd)
-  max <- -opt$value
+  m <- -opt$value
   theta_hat <- opt$par
   
   # compute the p value and return
-  p_val <- 1/(R+1) * min(floor(max)+1, R+1)
+  p_val <- 1/(R+1) * min(floor(m)+1, R+1)
   
   # compile a list of values to return
   results <- list(p_val = p_val,
-                  rank = floor(max)+1,
+                  rank = floor(m)+1,
                   theta_hat = theta_hat)
   
   return(results)
