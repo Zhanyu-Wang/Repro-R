@@ -30,7 +30,7 @@ get_CI <- function(alpha, lower_bds, upper_bds, j, seeds, G, s_obs, tol, T_stat 
       right_previous = beta_right
       
       # I personally want to change this to tol/2 to make the overall error tol
-      while (right-left > tol) { 
+      while (right-left > tol/2) { 
         mid = (left + right)/2
         if (sub_search(left, right)) {
           right_previous = right
@@ -49,7 +49,7 @@ get_CI <- function(alpha, lower_bds, upper_bds, j, seeds, G, s_obs, tol, T_stat 
       left_previous = beta_left
       right = beta_right
       
-      while (right-left > tol) { 
+      while (right-left > tol/2) { 
         mid = (left + right)/2
         if (sub_search(left, right)) {
           left_previous = left
