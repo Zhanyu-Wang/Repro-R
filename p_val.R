@@ -22,7 +22,7 @@ ma_depth(x_test, data_test, 0)
 
 
 # p_value function 
-p_value <- function(lower_bd, upper_bd, t_init, seeds, G, s_obs, T_stat = ma_depth){
+p_value <- function(lower_bds, upper_bds, t_init, seeds, G, s_obs, T_stat = ma_depth){
   # extract the number of seeds R
   R <- dim(seeds)[1]
   d <- length(s_obs)
@@ -49,8 +49,8 @@ p_value <- function(lower_bd, upper_bd, t_init, seeds, G, s_obs, T_stat = ma_dep
   # finding the largest 
   opt <- optim(par = t_init, 
                fn = count,
-               lower = lower_bd,
-               uppper = upper_bd)
+               lower = lower_bds,
+               uppper = upper_bds)
   m <- -opt$value
   theta_hat <- opt$par
   
@@ -68,9 +68,9 @@ p_value <- function(lower_bd, upper_bd, t_init, seeds, G, s_obs, T_stat = ma_dep
 
 
 # accept function
-accept <- function(alpha, lower_bd, upper_bd, t_init, seeds, G, s_obs, T_stat = ma_depth){
+accept <- function(alpha, lower_bds, upper_bds, t_init, seeds, G, s_obs, T_stat = ma_depth){
   # calling the p_value function as a subroutine
-  p_val <- p_value(lower_bd, upper_bd, t_init, seeds, G, s_obs, T_stat = ma_depth)$p_val
+  p_val <- p_value(lower_bds, upper_bds, t_init, seeds, G, s_obs, T_stat = ma_depth)$p_val
   
   # return true if we fail to reject
   return(p_val > alpha)
