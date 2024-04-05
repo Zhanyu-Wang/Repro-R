@@ -16,7 +16,7 @@ s_sample <- function(u, theta) {
   # w/  specified mean and std. dev.for that dimension. 
   # These nums are then added to the `samples` matrix.
   for (i in  1:num_dimensions) {
-    samples[, i] <- rnorm(num_samples, mean = mean[i], sd = sd[i])
+    samples[, i] <- qnorm(u[i,], mean = mean, sd = sd)
   }
    
   return(samples) # matrix of simulated samples returned
