@@ -1,5 +1,7 @@
 
 
+source("p_val.R")
+
 get_CI <- function(alpha, lower_bds, upper_bds, j, seeds, G, s_obs, tol, t_init = NULL, T_stat = ma_depth) {
   # j indicates that we're computing the confidence interval for the jth parameter
   # tol represents the allowed tolerance on the boundary of our interval
@@ -69,43 +71,6 @@ get_CI <- function(alpha, lower_bds, upper_bds, j, seeds, G, s_obs, tol, t_init 
     return(NULL) # no point in the parameter space is likely, so return the empty set
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

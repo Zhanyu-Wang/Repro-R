@@ -15,8 +15,8 @@ s_sample <- function(u, theta) {
   # loop iterates over each dimension, generating set of random nums. from a normal distribution 
   # w/  specified mean and std. dev.for that dimension. 
   # These nums are then added to the `samples` matrix.
-  for (i in  1:num_dimensions) {
-    samples[, i] <- qnorm(u[i,], mean = mean, sd = sd)
+  for (i in  1 : num_samples) {
+    samples[i,] <- qnorm(u[i,], mean = mean, sd = sd)
   }
    
   return(samples) # matrix of simulated samples returned
@@ -31,7 +31,7 @@ s_sample <- function(u, theta) {
 # location-scale normal distribution -> the T statistic could be computed as the sum of sqrd diffs between each simulated value and 
 # the observed data, -> summed across all dimensions.
 
-T_calc <- function(S, theta) {
+T_calc <- function(x, S, theta) {
   # Extract the mean (location) and standard deviation (scale) from theta
   mean <- theta[1]
   sd <- theta[2]

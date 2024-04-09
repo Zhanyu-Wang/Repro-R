@@ -54,8 +54,9 @@ p_value <- function(lower_bds, upper_bds, seeds, G, s_obs, t_init = NULL, T_stat
   # finding the largest 
   opt <- optim(par = t_init, 
                fn = count,
+               method = "L-BFGS-B",
                lower = lower_bds,
-               uppper = upper_bds)
+               upper = upper_bds)
   m <- -opt$value
   theta_hat <- opt$par
   
