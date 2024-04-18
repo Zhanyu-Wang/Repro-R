@@ -22,7 +22,7 @@ get_CI <- function(alpha, lower_bds, upper_bds, j, seeds, G, s_obs, tol, t_init 
       updated_upper[j] <- beta_right
       
       # call the accept function to see if (beta_left, beta_right) contains a valid point
-      return(accept(alpha, updated_lower, updated_upper, seeds, G, s_obs, T_stat))
+      return(accept(alpha, updated_lower, updated_upper, seeds, G, s_obs, t_init, T_stat))
     }
     
     # bisection to find the left boundary
