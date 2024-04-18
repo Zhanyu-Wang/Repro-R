@@ -22,10 +22,7 @@ s_sample <- function(u, theta) {
   return(samples) # matrix of simulated samples returned
 }
 
-# optimize for loop,, num_samples * num_dimensions,, 
-# apply diff privacy method to s_sample,, clamp data (lower/upper),, use p_max, P-min
-## clamp data,, add noise
-# take mean/sample variance -> R x 2 matrix
+
 
 
 # location-scale normal distribution -> the T statistic could be computed as the sum of sqrd diffs between each simulated value and 
