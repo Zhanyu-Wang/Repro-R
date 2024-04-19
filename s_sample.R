@@ -1,3 +1,5 @@
+
+
 s_sample <- function(u, theta) {
   # Extract the mean (location) and std. dev (scale) from theta
   mean <- theta[1]
@@ -16,7 +18,7 @@ s_sample <- function(u, theta) {
   # w/  specified mean and std. dev.for that dimension. 
   # These nums are then added to the `samples` matrix.
   for (i in  1 : num_samples) {
-    samples[i,] <- qnorm(u[i,], mean = mean, sd = sd)
+    samples[i,] <- qnorm(u[i,], mean = mean, sd = sd/sqrt(100)) # input sample size
   }
    
   return(samples) # matrix of simulated samples returned
