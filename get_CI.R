@@ -1,6 +1,6 @@
 
 
-source("p_val.R")
+source("./p_val.R")
 
 get_CI <- function(alpha, lower_bds, upper_bds, j, seeds, G, s_obs, tol, t_init = NULL, T_stat = ma_depth) {
   # j indicates that we're computing the confidence interval for the jth parameter
