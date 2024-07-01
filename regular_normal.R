@@ -3,6 +3,29 @@
 source("s_sample.R")
 source("get_CI.R")
 
+s_sample <- function(u, theta) {
+  # Extract the mean (location) and std. dev (scale) from theta
+  mean <- theta[1]
+  sd <- theta[2]
+  
+  # Determine the number of samples and dimensions from the seed matrix u
+  # are determined from the `u` matrix.
+  num_samples <- nrow(u)
+  num_dimensions <- ncol(u)
+  
+  # Initialize a matrix to store the samples
+  samples <- matrix(0, nrow = num_samples, ncol = num_dimensions)
+  
+  # Generate samples from a location-scale normal distribution for each dimension 
+  # loop iterates over each dimension, generating set of random nums. from a normal distribution 
+  # w/  specified mean and std. dev.for that dimension. 
+  # These nums are then added to the `samples` matrix.
+  for (i in  1 : num_samples) {
+    samples[i,] <- qnorm(u[i,], mean = mean, sd = sd/sqrt(100)) # input sample size
+  }
+  
+  return(samples) # matrix of simulated samples returned
+}
 
 sample_size <- 100 # sample size
 R <- 200 # Repro sample size R
