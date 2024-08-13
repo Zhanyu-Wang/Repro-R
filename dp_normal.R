@@ -49,29 +49,43 @@ s_observed <- function(){
   clamped <- pmin(pmax(raw, lower_clamp), upper_clamp)
   
   # compute the private statistics
-  s_mean <- mean(raw) + (upper_clamp - lower_clamp) / (n * eps) * rnorm(1)
-  s_var <- var(raw) + (upper_clamp - lower_clamp)^2 / (n * eps) * rnorm(1)
+  s_mean <- mean(clamped) + (upper_clamp - lower_clamp) / (n * eps) * rnorm(1)
+  s_var <- var(clamped) + (upper_clamp - lower_clamp)^2 / (n * eps) * rnorm(1)
   
   return(c(s_mean, s_var))
 }
 
 
 # running a simulation for coverage
-simulation <- function(var_or_not) {
-  # if function input is 0, we're testing for mean, variance if the input is 1.
-  if (var_or_not == 0) {
-    j = 1
-  } else {
-    j = 2
-  }
-  
+simulation <- function() {
+  # generate the seeds and the observed statistic
   seeds <- seed_generator()
   s_obs <- s_observed()
   
   # run the get_CI function
-  CI <- get_CI(alpha, lower_bds, upper_bds, j, seeds, s_sample, s_obs, tol)
-  return(CI)
+  mean_CI <- get_CI2(alpha, lower_bds, upper_bds, 1, seeds, s_sample, s_obs, tol)
+  sigma_CI <- get_CI2(alpha, lower_bds, upper_bds, 2, seeds, s_sample, s_obs, tol)
+  
+  # result (does the CI contain the true parameter?)
+  result1 <- FALSE
+  result2 <- FALSE
+  if (mean_CI[1] <= population_mu && 
+      mean_CI[2] >= population_mu) {
+    result1 <- TRUE
+  }
+  if (sigma_CI[1] <= population_sigma && 
+      sigma_CI[2] >= population_sigma) {
+    result2 <- TRUE
+  }
+  
+  return(cbind(result1, result2))
 }
+
+
+start_time <- proc.time()
+simulation()
+end_time <- proc.time()
+print(end_time - start_time)
 
 
 
