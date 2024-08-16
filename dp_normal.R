@@ -56,6 +56,7 @@ s_observed <- function(){
 }
 
 
+
 # running a simulation for coverage
 simulation <- function() {
   # generate the seeds and the observed statistic
@@ -81,12 +82,12 @@ simulation <- function() {
   return(cbind(result1, result2))
 }
 
-
+# error instance
 start_time <- proc.time()
+set.seed(2)
 simulation()
 end_time <- proc.time()
 print(end_time - start_time)
-
 
 
 
