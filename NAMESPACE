@@ -2,5 +2,8 @@
 
 export(confidence_grid)
 export(get_CI)
+export(grid_projection)
+export(p_value)
+export(plot_grid)
 import(ggplot2)
 importFrom(ddalpha,depth.Mahalanobis)

@@ -14,7 +14,8 @@ get_CI(
   s_obs,
   tol,
   t_init = NULL,
-  T_stat = ma_depth
+  T_stat = ma_depth,
+  print_info = FALSE
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ get_CI(
 \item{t_init}{Starting point for the initial search.}
 
 \item{T_stat}{A distance metric.}
+
+\item{print_info}{Whether or not to print the optim information}
 }
 \value{
 A vector containing the lower and upper boundary of the confidence interval. In the case when no point is accepted in the search space, return NULL.
@@ -45,6 +48,66 @@ A vector containing the lower and upper boundary of the confidence interval. In 
 Given the observed statistic, this function computes a confidence interval given that the data generating process is known using the supplied random seeds.
 }
 \examples{
-# DP Normal
-blahblahblah
+### Regular Normal
+set.seed(123)
+n <- 500 # sample size
+R <- 200 # Repro sample size
+alpha <- .05 # significance level
+tol <- 1e-4 # tolerance for the confidence set
+s_obs <- c(1.12, 0.67) # the observed sample mean and variance
+seeds <- matrix(rnorm(R * (n + 2)), nrow = R, ncol = n + 2) # pre-generated seeds
+
+# this function computes the repro statistics given the seeds and the parameter
+s_sample <- function(seeds, theta) {
+# generate the raw data points
+  raw_data <- theta[1] + sqrt(theta[2]) * seeds[, 1:n]
+
+  # compute the regular statistics
+  s_mean <- apply(raw_data, 1, mean)
+  s_var <- apply(raw_data, 1, var)
+
+  return(cbind(s_mean, s_var))
+}
+
+lower_bds <- c(-5, 0.01) # lower bounds for the parameter search region
+upper_bds <- c(5, 5) # upper bounds for the parameter search region
+
+# choose j = 1 to get the confidence interval for the mean
+mean_CI <- get_CI(alpha, lower_bds, upper_bds, 1, seeds, s_sample, s_obs, tol)
+print(mean_CI) # estimated confidence interval for mean
+var_CI <- get_CI(alpha, lower_bds, upper_bds, 2, seeds, s_sample, s_obs, tol)
+print(var_CI) # estimated confidence interval for variance
+
+### DP Normal
+set.seed(123)
+n <- 500 # sample size
+R <- 200 # Repro sample size
+upper_clamp <- 3
+lower_clamp <- 0
+eps <- 1 # privacy guarantee parameter
+alpha <- .05 # significance level
+tol <- 1e-4 # tolerance for the confidence set
+
+s_obs <- c(1.31, 0.67) # the observed private mean and variance
+seeds <-  matrix(rnorm(R * (n + 2)), nrow = R, ncol = n + 2) # pre-generated seeds
+
+s_sample <- function(seeds, theta) {
+# generate the raw data points
+  raw_data <- theta[1] + sqrt(theta[2]) * seeds[, 1:n]
+
+  # clamp the raw data
+  clamped <- pmin(pmax(raw_data, lower_clamp), upper_clamp)
+
+  # compute the private statistics
+  s_mean <- apply(clamped, 1, mean) + (upper_clamp - lower_clamp) / (n * eps) * seeds[, n+1]
+  s_var <- apply(clamped, 1, var) + (upper_clamp - lower_clamp)^2 / (n * eps) * seeds[, n+2]
+
+  return(cbind(s_mean, s_var))
+}
+
+dp_mean_CI <- get_CI(alpha, lower_bds, upper_bds, 1, seeds, s_sample, s_obs, tol)
+print(dp_mean_CI) # estimated confidence interval for mean
+dp_var_CI <- get_CI(alpha, lower_bds, upper_bds, 2, seeds, s_sample, s_obs, tol)
+print(dp_var_CI) # estimated confidence interval for variance
+
 }
