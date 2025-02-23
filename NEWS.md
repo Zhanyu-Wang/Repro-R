@@ -1,6 +1,4 @@
-# SimBaRepro (development version)
-
-# NEWS
+# SimBaRepro (version history)
 
 ## [0.0.1] - 2025-02-23
 ### Initial CRAN submission
