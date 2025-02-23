@@ -11,24 +11,21 @@ ma_depth <- function(x, data, theta) {
 #'
 #' Given the observed statistic and the given seeds, this function finds the largest p_value and the corresponding parameter
 #'
-#' @param alpha Significance level.
 #' @param lower_bds Vector containing the lower bounds for the search space.
 #' @param upper_bds Vector containing the upper bounds for the search space
 #' @param seeds Seeds containing all the randomness.
-#' @param G Data generating process.
+#' @param G Data generating function.
 #' @param s_obs Observed statistic.
-#' @param tol tolerance of the confidence interval.
 #' @param t_init Starting point for the initial search.
-#' @param T_stat A distance metric.
+#' @param T_stat A distance metric (default to ma_depth which measures the Mahalanobis distance).
 #' @param print_info Whether or not to print the optim information
+#' @param check_input Whether or not to run checks on the function inputs.
 #' @return This function returns a list containing the minimum p value (p_val) within the search region and the parameter corresponding to it (theta_hat).
 #' @examples
 #' ### Regular Normal
 #' set.seed(123)
-#' n <- 500 # sample size
+#' n <- 50 # sample size
 #' R <- 200 # Repro sample size
-#' alpha <- .05 # significance level
-#' tol <- 1e-4 # tolerance for the confidence set
 #' s_obs <- c(1.12, 0.67) # the observed sample mean and variance
 #' seeds <- matrix(rnorm(R * (n + 2)), nrow = R, ncol = n + 2) # pre-generated seeds
 #'
@@ -56,9 +53,30 @@ ma_depth <- function(x, data, theta) {
 #' @export
 
 # p_value function
-p_value <- function(lower_bds, upper_bds, seeds, G, s_obs, t_init = NULL, T_stat = ma_depth, print_info = FALSE) {
+p_value <- function(lower_bds, upper_bds, seeds, G, s_obs, t_init = NULL, T_stat = ma_depth, print_info = FALSE, check_input = TRUE) {
+
+  seeds_dim = dim(seeds)
+  # input tests
+  if (isTRUE(check_input)) {
+    if (length(lower_bds) != length(upper_bds)) {
+      stop("Lengths of inputs 'lower_bds' and 'upper_bds' must match.")
+    } else if (any(lower_bds >= upper_bds)) {
+      stop("'lower_bds' must be smaller than 'upper_bds' at all entries (elementwise).")
+    } else if (length(seeds_dim) != 2) {
+      stop("'seeds' must be a 2-dimensional object (either a matrix or an array).")
+    } else if (!is.numeric(seeds) || any(is.na(seeds))) {
+      stop("'seeds' must be a numeric matrix or array without NA values.")
+    } else if (!is.function(G)) {
+      stop("'G' must be a function.")
+    } else if (length(formals(G)) != 2) {
+      stop("'G' must be a function with exactly two inputs. The first one is a matrix or an array, the second one is a vector.")
+    } else if (length(s_obs) != length(lower_bds)) {
+      stop("'s_obs' must have the same length as 'lower_bds' and 'upper_bds'.")
+    }
+  }
+
   # extract the number of seeds R
-  R <- dim(seeds)[1]
+  R <- seeds_dim[1]
   d <- length(s_obs)
 
   # a function that generate R simulated values using the seeds and G, store s_obs and s_sim in an R+1 by d matrix
@@ -92,7 +110,7 @@ p_value <- function(lower_bds, upper_bds, seeds, G, s_obs, t_init = NULL, T_stat
                method = "L-BFGS-B",
                lower = lower_bds,
                upper = upper_bds)
-  if (print_info) {
+  if (isTRUE(print_info)) {
     print("opt result")
     print(opt)
   }

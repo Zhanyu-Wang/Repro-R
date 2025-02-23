@@ -10,18 +10,20 @@
 #' @param seeds Seeds containing all the randomness.
 #' @param G Data generating process.
 #' @param s_obs Observed statistic.
-#' @param tol tolerance of the confidence interval.
+#' @param tol Tolerance of the confidence interval.
 #' @param t_init Starting point for the initial search.
-#' @param T_stat A distance metric.
+#' @param T_stat A distance metric (default to ma_depth which measures the Mahalanobis distance).
 #' @param print_info Whether or not to print the optim information
+#' @param check_input Whether or not to run checks on the function inputs.
 #' @return A vector containing the lower and upper boundary of the confidence interval. In the case when no point is accepted in the search space, return NULL.
 #' @examples
+#' ### Note that the examples may take a few seconds to run.
 #' ### Regular Normal
 #' set.seed(123)
-#' n <- 100 # sample size
+#' n <- 50 # sample size
 #' R <- 200 # Repro sample size
 #' alpha <- .05 # significance level
-#' tol <- 1e-4 # tolerance for the confidence set
+#' tol <- 1e-2 # tolerance for the confidence set
 #' s_obs <- c(1.12, 0.67) # the observed sample mean and variance
 #' seeds <- matrix(rnorm(R * (n + 2)), nrow = R, ncol = n + 2) # pre-generated seeds
 #'
@@ -46,48 +48,29 @@
 #' var_CI <- get_CI(alpha, lower_bds, upper_bds, 2, seeds, s_sample, s_obs, tol)
 #' print(var_CI) # estimated confidence interval for variance
 #'
-#' ### DP Normal
-#' set.seed(123)
-#' n <- 100 # sample size
-#' R <- 200 # Repro sample size
-#' upper_clamp <- 3
-#' lower_clamp <- 0
-#' eps <- 1 # privacy guarantee parameter
-#' alpha <- .05 # significance level
-#' tol <- 1e-4 # tolerance for the confidence set
-#'
-#' s_obs <- c(1.31, 0.67) # the observed private mean and variance
-#' seeds <-  matrix(rnorm(R * (n + 2)), nrow = R, ncol = n + 2) # pre-generated seeds
-#'
-#' s_sample <- function(seeds, theta) {
-#' # generate the raw data points
-#'   raw_data <- theta[1] + sqrt(theta[2]) * seeds[, 1:n]
-#'
-#'   # clamp the raw data
-#'   clamped <- pmin(pmax(raw_data, lower_clamp), upper_clamp)
-#'
-#'   # compute the private statistics
-#'   s_mean <- apply(clamped, 1, mean) + (upper_clamp - lower_clamp) / (n * eps) * seeds[, n+1]
-#'   s_var <- apply(clamped, 1, var) + (upper_clamp - lower_clamp)^2 / (n * eps) * seeds[, n+2]
-#'
-#'   return(cbind(s_mean, s_var))
-#' }
-#'
-#' dp_mean_CI <- get_CI(alpha, lower_bds, upper_bds, 1, seeds, s_sample, s_obs, tol)
-#' print(dp_mean_CI) # estimated confidence interval for mean
-#' dp_var_CI <- get_CI(alpha, lower_bds, upper_bds, 2, seeds, s_sample, s_obs, tol)
-#' print(dp_var_CI) # estimated confidence interval for variance
-#'
 #' @export
 
 
-get_CI <- function(alpha, lower_bds, upper_bds, j, seeds, G, s_obs, tol, t_init = NULL, T_stat = ma_depth, print_info = FALSE) {
+get_CI <- function(alpha, lower_bds, upper_bds, j, seeds, G, s_obs, tol, t_init=NULL, T_stat=ma_depth, print_info=FALSE, check_input=TRUE) {
   # j indicates that we're computing the confidence interval for the jth parameter
   # tol represents the allowed tolerance on the boundary of our interval
   # T_stat is default to ma_depth as defined in the p_val file
 
+  if (isTRUE(check_input)) {
+    # input check
+    if (!is.numeric(alpha)) {
+      stop("Significance level 'alpha' must be a number.")
+    } else if (alpha > 1 || alpha < 0) {
+      stop("Significance level 'alpha' must be a number between 0 and 1.")
+    } else if (!is.numeric(tol)) {
+      stop("'tol' must be a positive number.")
+    } else if (tol > 1) {
+      print("A large 'tol' might lead to inaccuracies in the result.")
+    }
+  }
+
   # use the p_value function to identify the best starting point for bisection, if there exits any
-  general_search <- p_value(lower_bds, upper_bds, seeds, G, s_obs, t_init, T_stat)
+  general_search <- p_value(lower_bds, upper_bds, seeds, G, s_obs, t_init, T_stat, print_info, check_input)
 
   if (general_search$p_val > alpha) {
     # use the jth coordinate of theta_hat as the starting point for bisection
@@ -97,7 +80,7 @@ get_CI <- function(alpha, lower_bds, upper_bds, j, seeds, G, s_obs, tol, t_init 
     sub_search <- function(beta_left, beta_right, beta_init) {
 
       # print search information for tractability
-      if (print_info) {
+      if (isTRUE(print_info)) {
         print('current bisection interval')
         print(c(beta_left, beta_right))
         print('search starting point')
@@ -112,7 +95,7 @@ get_CI <- function(alpha, lower_bds, upper_bds, j, seeds, G, s_obs, tol, t_init 
       # call the p_value function on the interval (beta_left, beta_right) with initial point
       initial_point <- (updated_lower + updated_upper) / 2
       initial_point[j] <- beta_init
-      return(p_value(updated_lower, updated_upper, seeds, G, s_obs, initial_point, T_stat))
+      return(p_value(updated_lower, updated_upper, seeds, G, s_obs, initial_point, T_stat, print_info, check_input=FALSE))
     }
 
     # bisection to find the left boundary

@@ -12,7 +12,8 @@ p_value(
   s_obs,
   t_init = NULL,
   T_stat = ma_depth,
-  print_info = FALSE
+  print_info = FALSE,
+  check_input = TRUE
 )
 }
 \arguments{
@@ -22,19 +23,17 @@ p_value(
 
 \item{seeds}{Seeds containing all the randomness.}
 
-\item{G}{Data generating process.}
+\item{G}{Data generating function.}
 
 \item{s_obs}{Observed statistic.}
 
 \item{t_init}{Starting point for the initial search.}
 
-\item{T_stat}{A distance metric.}
+\item{T_stat}{A distance metric (default to ma_depth which measures the Mahalanobis distance).}
 
 \item{print_info}{Whether or not to print the optim information}
 
-\item{alpha}{Significance level.}
-
-\item{tol}{tolerance of the confidence interval.}
+\item{check_input}{Whether or not to run checks on the function inputs.}
 }
 \value{
 This function returns a list containing the minimum p value (p_val) within the search region and the parameter corresponding to it (theta_hat).
@@ -45,10 +44,8 @@ Given the observed statistic and the given seeds, this function finds the larges
 \examples{
 ### Regular Normal
 set.seed(123)
-n <- 500 # sample size
+n <- 50 # sample size
 R <- 200 # Repro sample size
-alpha <- .05 # significance level
-tol <- 1e-4 # tolerance for the confidence set
 s_obs <- c(1.12, 0.67) # the observed sample mean and variance
 seeds <- matrix(rnorm(R * (n + 2)), nrow = R, ncol = n + 2) # pre-generated seeds
 

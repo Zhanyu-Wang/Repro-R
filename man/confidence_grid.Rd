@@ -45,12 +45,13 @@ A list containing ind_array, updated_lower_bds, and updated_upper_bds.
 returns the indicator array
 }
 \examples{
+### Note that the examples may take a few seconds to run.
 ### Regular normal
 set.seed(123)
-n <- 100 # sample size
+n <- 50 # sample size
 R <- 200 # Repro sample size
 alpha <- .05 # significance level
-tol <- 1e-4 # tolerance for the confidence set
+tol <- 1e-2 # tolerance for the confidence set
 s_obs <- c(1.12, 0.67) # the observed sample mean
 seeds <- matrix(rnorm(R * (n + 2)), nrow = R, ncol = n + 2) # pre-generated seeds
 
@@ -66,13 +67,13 @@ s_sample <- function(seeds, theta) {
   return(cbind(s_mean, s_var))
 }
 
-lower_bds <- c(-5, 0.01) # lower bounds for the parameter search region
-upper_bds <- c(5, 5) # upper bounds for the parameter search region
+lower_bds <- c(0.5, 0.3) # lower bounds for the parameter search region
+upper_bds <- c(1.5, 1.3) # upper bounds for the parameter search region
 
-res = 10  # resolution of the grid
+res = 20  # resolution of the grid
 result <- confidence_grid(alpha, lower_bds, upper_bds, seeds, s_sample, s_obs, tol, res)
 print(result$ind_array)
-print(result$updated_lower_bds)
-print(result$updated_upper_bds)
+print(result$search_lower_bds)
+print(result$search_upper_bds)
 
 }
