@@ -9,37 +9,37 @@ confidence_grid(
   lower_bds,
   upper_bds,
   seeds,
-  G,
+  generating_fun,
   s_obs,
   tol,
-  res,
-  t_init = NULL,
+  resolution,
+  theta_init = NULL,
   T_stat = ma_depth
 )
 }
 \arguments{
-\item{alpha}{Significance level.}
+\item{alpha}{A numeric representing the significance level of the test.}
 
-\item{lower_bds}{Vector containing the lower bounds for the search space.}
+\item{lower_bds}{A vector containing the lower bounds for the parameter search space.}
 
-\item{upper_bds}{Vector containing the upper bounds for the search space}
+\item{upper_bds}{A vector containing the upper bounds for the parameter search space.}
 
-\item{seeds}{Seeds containing all the randomness.}
+\item{seeds}{A matrix (or array) of seeds for generating artificial statistics.}
 
-\item{G}{Data generating process.}
+\item{generating_fun}{A function that takes the random seeds above and a parameter in the search space as inputs to generate artificial statistics.}
 
-\item{s_obs}{Observed statistic.}
+\item{s_obs}{A vector representing the observed statistic.}
 
-\item{tol}{tolerance of the confidence interval.}
+\item{tol}{A numeric specifying the tolerance of the confidence interval.}
 
-\item{res}{resolution of the grid}
+\item{resolution}{An integer specifying the mesh number of the search space.}
 
-\item{t_init}{Starting point for the initial search.}
+\item{theta_init}{A vector specifying the starting point for the initial \code{optim} search.}
 
-\item{T_stat}{A distance metric, default to Mahalanobis distance.}
+\item{T_stat}{Default to the Mahalanobis distance. See Vignette for detailed explanation.}
 }
 \value{
-A list containing ind_array, updated_lower_bds, and updated_upper_bds.
+A list containing an indicator array (\code{ind_array}) representing the confidence set, the confidence set lower bounds (\code{updated_lower_bds}), and the confidence set upper bounds (\code{updated_upper_bds}).
 }
 \description{
 returns the indicator array
@@ -70,8 +70,8 @@ s_sample <- function(seeds, theta) {
 lower_bds <- c(0.5, 0.3) # lower bounds for the parameter search region
 upper_bds <- c(1.5, 1.3) # upper bounds for the parameter search region
 
-res = 20  # resolution of the grid
-result <- confidence_grid(alpha, lower_bds, upper_bds, seeds, s_sample, s_obs, tol, res)
+resolution = 20  # resolution of the grid
+result <- confidence_grid(alpha, lower_bds, upper_bds, seeds, s_sample, s_obs, tol, resolution)
 print(result$ind_array)
 print(result$search_lower_bds)
 print(result$search_upper_bds)

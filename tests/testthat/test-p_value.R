@@ -36,7 +36,7 @@ test_that("p_value: input checks work", {
                        seeds = seeds,
                        G = s_sample,
                        s_obs = s_obs),
-               "'lower_bds' must be smaller than 'upper_bds' at all entries")
+               "'lower_bds' must be smaller than or equal to 'upper_bds' entry-wise.")
 
   # 'seeds' is not a 2d object
   expect_error(p_value(lower_bds = lower_bds,
@@ -69,14 +69,6 @@ test_that("p_value: input checks work", {
                        G = bad_G,
                        s_obs = s_obs),
                "'G' must be a function with exactly two inputs. The first one is a matrix or an array, the second one is a vector.")
-
-  # 's_obs' has the wrong dimension
-  expect_error(p_value(lower_bds = lower_bds,
-                       upper_bds = upper_bds,
-                       seeds = seeds,
-                       G = s_sample,
-                       s_obs = 1.2),
-               "'s_obs' must have the same length as 'lower_bds' and 'upper_bds'.")
 })
 
 test_that("p_value example runs without error", {

@@ -8,44 +8,44 @@ get_CI(
   alpha,
   lower_bds,
   upper_bds,
-  j,
+  parameter_index,
   seeds,
-  G,
+  generating_fun,
   s_obs,
   tol,
-  t_init = NULL,
+  theta_init = NULL,
   T_stat = ma_depth,
   print_info = FALSE,
   check_input = TRUE
 )
 }
 \arguments{
-\item{alpha}{Significance level.}
+\item{alpha}{A numeric representing the significance level of the test.}
 
-\item{lower_bds}{Vector containing the lower bounds for the search space.}
+\item{lower_bds}{A vector containing the lower bounds for the parameter search space.}
 
-\item{upper_bds}{Vector containing the upper bounds for the search space}
+\item{upper_bds}{A vector containing the upper bounds for the parameter search space.}
 
-\item{j}{Index indicating the parameter of interest.}
+\item{parameter_index}{An integer indicating the parameter of interest.}
 
-\item{seeds}{Seeds containing all the randomness.}
+\item{seeds}{A matrix (or array) of seeds for generating artificial statistics.}
 
-\item{G}{Data generating process.}
+\item{generating_fun}{A function that takes the random seeds above and a parameter in the search space as inputs to generate artificial statistics.}
 
-\item{s_obs}{Observed statistic.}
+\item{s_obs}{A vector representing the observed statistic.}
 
-\item{tol}{Tolerance of the confidence interval.}
+\item{tol}{A numeric specifying the tolerance of the confidence interval.}
 
-\item{t_init}{Starting point for the initial search.}
+\item{theta_init}{A vector specifying the starting point for the initial \code{optim} search.}
 
-\item{T_stat}{A distance metric (default to ma_depth which measures the Mahalanobis distance).}
+\item{T_stat}{Default to the Mahalanobis distance. See Vignette for detailed explanation.}
 
-\item{print_info}{Whether or not to print the optim information}
+\item{print_info}{A Boolean variable indicating whether or not to print out the \code{optim} messages.}
 
-\item{check_input}{Whether or not to run checks on the function inputs.}
+\item{check_input}{A Boolean variable indicating whether or not to run checks on the function inputs.}
 }
 \value{
-A vector containing the lower and upper boundary of the confidence interval. In the case when no point is accepted in the search space, return NULL.
+A length-2 vector representing the obtained confidence interval. In the case when no point is accepted in the search space, return \code{NULL}.
 }
 \description{
 Given the observed statistic, this function computes a confidence interval given that the data generating process is known using the supplied random seeds.
@@ -76,7 +76,7 @@ s_sample <- function(seeds, theta) {
 lower_bds <- c(-5, 0.01) # lower bounds for the parameter search region
 upper_bds <- c(5, 5) # upper bounds for the parameter search region
 
-# choose j = 1 to get the confidence interval for the mean
+# choose parameter_index = 1 to get the confidence interval for the mean
 mean_CI <- get_CI(alpha, lower_bds, upper_bds, 1, seeds, s_sample, s_obs, tol)
 print(mean_CI) # estimated confidence interval for mean
 var_CI <- get_CI(alpha, lower_bds, upper_bds, 2, seeds, s_sample, s_obs, tol)

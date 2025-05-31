@@ -1,9 +1,13 @@
 Package: SimBaRepro
-Title: Simulation-Based Confidence Interval Estimation
+Title: Simulation-Based, Finite-Sample Inference via Repro Samples
 Version: 0.0.0.9000
 Authors@R: 
-    person("Xinlong", "Du", , "du339@purdue.edu", role = c("aut", "cre"))
-Description: This package includes a function for generating confidence intervals. In particular, this method is compatible with differentially private data set, as long as the privacy mechanism is known. 
+	c(
+		person("Xinlong", "Du", , "du339@purdue.edu", role = c("aut", "cre")),
+		person("Zhanyu", "Wang", ,"zhanyu.wang.purdue@gmail.com", role = "aut"),
+		person("Jordan", "Awan", ,"jawan@purdue.edu", role = "aut")
+	)
+Description: This package includes functions for finding p-values (for hypothesis tests), confidence intervals, and multivariate confidence sets. In particular, the method is compatible with differentially private dataset, as long as the privacy mechanism is known. 
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -11,3 +15,8 @@ RoxygenNote: 7.3.2
 Imports:
     ddalpha, ggplot2
 LazyData: true
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat
+VignetteBuilder: knitr

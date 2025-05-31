@@ -8,38 +8,41 @@ p_value(
   lower_bds,
   upper_bds,
   seeds,
-  G,
+  generating_fun,
   s_obs,
-  t_init = NULL,
+  theta_init = NULL,
   T_stat = ma_depth,
   print_info = FALSE,
   check_input = TRUE
 )
 }
 \arguments{
-\item{lower_bds}{Vector containing the lower bounds for the search space.}
+\item{lower_bds}{A vector containing the lower bounds for the parameter search space.}
 
-\item{upper_bds}{Vector containing the upper bounds for the search space}
+\item{upper_bds}{A vector containing the upper bounds for the parameter search space.}
 
-\item{seeds}{Seeds containing all the randomness.}
+\item{seeds}{A matrix (or array) of seeds for generating artificial statistics.}
 
-\item{G}{Data generating function.}
+\item{generating_fun}{A function that takes the random seeds above and a parameter in the search space as inputs to generate artificial statistics.}
 
-\item{s_obs}{Observed statistic.}
+\item{s_obs}{A vector representing the observed statistic.}
 
-\item{t_init}{Starting point for the initial search.}
+\item{theta_init}{A vector specifying the starting point for the initial \code{optim} search.}
 
-\item{T_stat}{A distance metric (default to ma_depth which measures the Mahalanobis distance).}
+\item{T_stat}{See Vignette for detailed explanation.}
 
-\item{print_info}{Whether or not to print the optim information}
+\item{print_info}{A Boolean variable indicating whether or not to print out the \code{optim} messages.}
 
-\item{check_input}{Whether or not to run checks on the function inputs.}
+\item{check_input}{A Boolean variable indicating whether or not to run checks on the function inputs.}
 }
 \value{
-This function returns a list containing the minimum p value (p_val) within the search region and the parameter corresponding to it (theta_hat).
+A list containing the most likely parameter in the search region (\code{theta_hat}) and its corresponding p-value (\code{p_val}).
 }
 \description{
-Given the observed statistic and the given seeds, this function finds the largest p_value and the corresponding parameter
+Given the observed statistic and the given seeds, this function finds the p-value.
+The method uses simulation-based inference, where having fixed seeds, the parameter is searched which makes the observed statistics most "plausible".
+In particular, the \code{T_stat} function measures the "plausibility" of any data point and the procedure maximizes the rank of the observed \code{T_stat} value relative to the "repro" 'T_stat' values.
+The p-value is determined from the maximum rank and the corresponding parameter is returned.
 }
 \examples{
 ### Regular Normal
@@ -61,8 +64,8 @@ s_sample <- function(seeds, theta) {
   return(cbind(s_mean, s_var))
 }
 
-lower_bds <- c(-5, 0.01) # lower bounds for the parameter search region
-upper_bds <- c(5, 5) # upper bounds for the parameter search region
+lower_bds <- c(-5, 0.01) # lower bounds for null hypothesis region
+upper_bds <- c(5, 5) # upper bounds for null hypothesis region
 
 result <- p_value(lower_bds, upper_bds, seeds, s_sample, s_obs)
 print(result$p_val) # the largest p_value found
