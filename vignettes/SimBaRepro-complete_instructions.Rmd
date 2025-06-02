@@ -316,6 +316,9 @@ This function returns a 2-dimensional indicator array.
     the user must choose the lower bounds and upper bounds for the two
     parameters of interests only.
 
+-   **`parameter_names`** : An optional vector argument specifying the
+    names of the two parameters.
+
 ## Example Workflows
 
 In this section, we'll walk through a few simple examples to demonstrate
@@ -465,7 +468,8 @@ specifies the number of grids for each element of the parameter. Since
 we already have a sense of where the confidence region is from the
 previously obtained confidence intervals, we can set `lower_bds` and
 `upper_bds` to be much narrower to obtain a finer representation of the
-confidence region.
+confidence region (which is valid only when we're using the same seeds
+as before).
 
 ```{r}
 lower_bds <- c(0.5, 1e-6)
@@ -492,7 +496,8 @@ indicator array above and visualizes it. Note that the 'lower_bds' and
 array.
 
 ```{r}
-plot_grid(indicator_array, lower_bds, upper_bds)
+parameter_names <- c("mean", "variance")
+plot_grid(indicator_array, lower_bds, upper_bds, parameter_names)
 ```
 
 Note that the plot looks just like a rotated version of the indicator
@@ -511,9 +516,9 @@ identity covariance matrix $\Sigma=\sigma^2 I_2$ (uncorrelated joint
 Gaussian with a common variance $\sigma^2=1$.). First, we obtain the
 indicator array as usual:
 
-```{r, include=FALSE}
-n <- 100            # sample size
-repro_size <- 200   # number of repro samples
+```{r}
+n <- 100 # sample size
+repro_size <- 200 # number of repro samples
 seeds <- matrix(rnorm(repro_size * (2 * n)), nrow = repro_size, ncol = 2 * n)
 
 s_sample <- function(seeds, theta) {
@@ -522,18 +527,18 @@ s_sample <- function(seeds, theta) {
   mu2 <- theta[2]          
   sigma <- sqrt(theta[3])
   
-  seeds1 <- seeds[, 1:n_obs, drop = FALSE]        # first n columns for X
-  seeds2 <- seeds[, (n_obs + 1):(2 * n_obs), drop = FALSE]  # next n columns for Y
+  seeds1 <- seeds[, 1:n_obs, drop = FALSE] # first n columns for X
+  seeds2 <- seeds[, (n_obs + 1):(2 * n_obs), drop = FALSE] # next n columns for Y
   
-  # Generate bivariate data
-  data1 <- mu1 + sigma * seeds1   # X ~ N(mu_1, sigma^2)
-  data2 <- mu2 + sigma * seeds2   # Y ~ N(\mu_2, sigma^2)
+  # generate bivariate data
+  data1 <- mu1 + sigma * seeds1 # X ~ N(mu_1, sigma^2)
+  data2 <- mu2 + sigma * seeds2 # Y ~ N(mu_2, sigma^2)
   
-  # Compute statistics
-  s_mean1 <- rowMeans(data1)      # sample mean of X
-  s_mean2 <- rowMeans(data2)      # sample mean of Y
-  s_var1 <- apply(data1, 1, var)  # sample variance of X (denominator n-1)
-  s_var2 <- apply(data2, 1, var)  # sample variance of Y (denominator n-1)
+  # compute statistics
+  s_mean1 <- rowMeans(data1) # sample mean of X
+  s_mean2 <- rowMeans(data2) # sample mean of Y
+  s_var1 <- apply(data1, 1, var) # sample variance of X
+  s_var2 <- apply(data2, 1, var) # sample variance of Y
   
   return(cbind(s_mean1, s_mean2, s_var1, s_var2))
 }
@@ -547,16 +552,18 @@ upper_bds <- c(0.5, 0.5, 2)
 resolution <- 10
 result <- confidence_grid(alpha, lower_bds, upper_bds, seeds, s_sample, s_obs, tol, resolution)
 indicator_array <- result$ind_array
-print(result)
 ```
 
-Now, suppose we're interested in the confidence set involving only the
-two means $\mu_1, \mu_2$, then we can choose the index set as follows:
+The statistics here are the two sample means and two sample variances,
+which include four real numebrs. However, the number of parameters does
+not need to match the dimension of the statistics. In this caes, there
+are only three parameters: two population means and a variance. Suppose
+we're interested in the confidence set involving only the two means
+$\mu_1, \mu_2$, then we can choose the index set as follows:
 
 ```{r}
 index_set <- c(1,2)
 means_array <- grid_projection(indicator_array, index_set)
-print(means_array)
 ```
 
 To plot the joint confidence region for $\mu_1,\mu_2$, we then use the
@@ -567,31 +574,32 @@ parameters. For example,
 ```{r}
 means_lower_bds <- lower_bds[index_set]
 means_upper_bds <- upper_bds[index_set]
-plot_grid(means_array, means_lower_bds, means_upper_bds)
+parameter_names <- c("mu1", "mu2")
+plot_grid(means_array, means_lower_bds, means_upper_bds, parameter_names)
 ```
 
 Alternatively, if we want to plot the confidence regions for $\mu_1$ and
 $\sigma^2$, or for $\mu_2$ and $\sigma^2$, we can choose a different
 index set and repeat the above procedure
 
-```{r, include=FALSE}
+```{r}
 index_set2 <- c(1,3)
 mu1_var_array <- grid_projection(indicator_array, index_set2)
-print(mu1_var_array)
 
 index_set3 <- c(2,3)
 mu2_var_array <- grid_projection(indicator_array, index_set3)
-print(mu2_var_array)
 ```
 
 ```{r, fig.show='hold'}
 mu1_var_lower_bds <- lower_bds[index_set2]
 mu1_var_upper_bds <- upper_bds[index_set2]
-plot_grid(mu1_var_array, mu1_var_lower_bds, mu1_var_upper_bds)
+parameter_names <- c("mu1", "variance")
+plot_grid(mu1_var_array, mu1_var_lower_bds, mu1_var_upper_bds, parameter_names)
 
 mu2_var_lower_bds <- lower_bds[index_set3]
 mu2_var_upper_bds <- upper_bds[index_set3]
-plot_grid(mu2_var_array, mu2_var_lower_bds, mu2_var_upper_bds)
+parameter_names <- c("mu2", "variance")
+plot_grid(mu2_var_array, mu2_var_lower_bds, mu2_var_upper_bds, parameter_names)
 ```
 
 Although these 2D visualizations are useful , it's to be noted that the
@@ -613,8 +621,8 @@ known), then computes an $(\epsilon, 0)$-differentially private
 statistic $s_{DP}=(\text{private mean}, \text{private variance})$ before
 releasing it to the public. How do we conduct hypothesis tests with
 privacy constraints in place? How can we obtain confidence
-intervals/sets for the population mean and variance? First, we set the
-basic parameters as before:
+intervals/sets for the population mean and variance? First, we use the
+same basic parameters as before:
 
 ```{r}
 n <- 50 # sample size
@@ -758,7 +766,8 @@ Lastly, we can visualize the confidence region using the `plot_grid`
 function.
 
 ```{r}
-plot_grid(indicator_array, lower_bds, upper_bds)
+parameter_names <- c("mean", "variance") # optional input
+plot_grid(indicator_array, lower_bds, upper_bds, parameter_names)
 ```
 
 The differentially-private confidence region looks more dispersed

@@ -3,9 +3,9 @@ Title: Simulation-Based, Finite-Sample Inference via Repro Samples
 Version: 0.0.0.9000
 Authors@R: 
 	c(
-		person("Xinlong", "Du", , "du339@purdue.edu", role = c("aut", "cre")),
-		person("Zhanyu", "Wang", ,"zhanyu.wang.purdue@gmail.com", role = "aut"),
-		person("Jordan", "Awan", ,"jawan@purdue.edu", role = "aut")
+		person(given = "Xinlong", family = "Du", , "du339@purdue.edu", role = c("aut", "cre")),
+		person(given = "Zhanyu", family = "Wang", , "zhanyu.wang.purdue@gmail.com", role = "aut"),
+		person(given = "Jordan", family = "Awan", , "jawan@purdue.edu", role = "aut")
 	)
 Description: This package includes functions for finding p-values (for hypothesis tests), confidence intervals, and multivariate confidence sets. In particular, the method is compatible with differentially private dataset, as long as the privacy mechanism is known. 
 License: GPL (>= 3)
