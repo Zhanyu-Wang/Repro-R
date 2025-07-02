@@ -11,7 +11,7 @@ test_that("plot_grid errors", {
   expect_error(plot_grid(indicator_array = array(1, dim = c(2, 2, 2)),
                          lower_bds = lower_bds,
                          upper_bds = upper_bds),
-               "'indivator_array' needs to be a 2-dimensional object.")
+               "'indicator_array' needs to be a 2-dimensional object.")
 
   # 'lower_bds' or 'upper_bds' are not of length 2
   expect_error(plot_grid(indicator_array = ind_array,

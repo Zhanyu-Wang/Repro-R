@@ -1,3 +1,5 @@
 ^confint\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
+^.*\.Rproj$
+^cran-comments\.md$

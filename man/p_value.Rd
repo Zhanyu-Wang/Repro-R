@@ -12,7 +12,7 @@ p_value(
   s_obs,
   theta_init = NULL,
   T_stat = ma_depth,
-  print_info = FALSE,
+  verbose = FALSE,
   check_input = TRUE
 )
 }
@@ -31,7 +31,7 @@ p_value(
 
 \item{T_stat}{See Vignette for detailed explanation.}
 
-\item{print_info}{A Boolean variable indicating whether or not to print out the \code{optim} messages.}
+\item{verbose}{A Boolean variable indicating whether or not to print out the \code{optim} messages.}
 
 \item{check_input}{A Boolean variable indicating whether or not to run checks on the function inputs.}
 }
@@ -48,7 +48,7 @@ The p-value is determined from the maximum rank and the corresponding parameter 
 ### Regular Normal
 set.seed(123)
 n <- 50 # sample size
-R <- 200 # Repro sample size
+R <- 50 # Repro sample size (should be at least 200 for accuracy in practice)
 s_obs <- c(1.12, 0.67) # the observed sample mean and variance
 seeds <- matrix(rnorm(R * (n + 2)), nrow = R, ncol = n + 2) # pre-generated seeds
 

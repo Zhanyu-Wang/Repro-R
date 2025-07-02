@@ -1,11 +1,5 @@
 # SimBaRepro (version history)
 
-## [0.1.0] - 2025-02-23
+## [0.1.0] - 2025-06-13
 ### Initial CRAN submission
 - Added functions including 'p_value', 'get_CI', 'confidence_grid', 'grid_projection', and 'plot_grid' to the package.
-
-## [0.1.0] - 2025-03-15
-### Fixed
-- Fixed something.
-### Added
-- Added new features.

@@ -24,27 +24,27 @@ test_that("confidence_grid: validates inputs correctly", {
 
   res = 20
 
-  # res is not a positive integer
+  # resolution is not a positive integer
   expect_error(confidence_grid(alpha = alpha,
                                lower_bds = lower_bds,
                                upper_bds = upper_bds,
                                seeds = seeds,
-                               G = s_sample,
+                               generating_fun = s_sample,
                                s_obs = s_obs,
                                tol = tol,
-                               res = TRUE),
-               "'res' must be a positive integer")
+                               resolution = TRUE),
+               "'resolution' must be a positive integer")
 
-  # res is not a positive integer
+  # resolution is not a positive integer
   expect_error(confidence_grid(alpha = alpha,
                                lower_bds = lower_bds,
                                upper_bds = upper_bds,
                                seeds = seeds,
-                               G = s_sample,
+                               generating_fun = s_sample,
                                s_obs = s_obs,
                                tol = tol,
-                               res = 20.5),
-               "'res' must be a positive integer")
+                               resolution = 20.5),
+               "'resolution' must be a positive integer")
 })
 
 test_that("confidence_grid: check example in function description", {

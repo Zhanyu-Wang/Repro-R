@@ -22,14 +22,14 @@ ma_depth <- function(x, data, theta) {
 #' @param s_obs A vector representing the observed statistic.
 #' @param theta_init A vector specifying the starting point for the initial `optim` search.
 #' @param T_stat  See Vignette for detailed explanation.
-#' @param print_info A Boolean variable indicating whether or not to print out the `optim` messages.
+#' @param verbose A Boolean variable indicating whether or not to print out the `optim` messages.
 #' @param check_input A Boolean variable indicating whether or not to run checks on the function inputs.
 #' @return A list containing the most likely parameter in the search region (`theta_hat`) and its corresponding p-value (`p_val`).
 #' @examples
 #' ### Regular Normal
 #' set.seed(123)
 #' n <- 50 # sample size
-#' R <- 200 # Repro sample size
+#' R <- 50 # Repro sample size (should be at least 200 for accuracy in practice)
 #' s_obs <- c(1.12, 0.67) # the observed sample mean and variance
 #' seeds <- matrix(rnorm(R * (n + 2)), nrow = R, ncol = n + 2) # pre-generated seeds
 #'
@@ -58,7 +58,7 @@ ma_depth <- function(x, data, theta) {
 #' @export
 
 # p_value function
-p_value <- function(lower_bds, upper_bds, seeds, generating_fun, s_obs, theta_init = NULL, T_stat = ma_depth, print_info = FALSE, check_input = TRUE) {
+p_value <- function(lower_bds, upper_bds, seeds, generating_fun, s_obs, theta_init = NULL, T_stat = ma_depth, verbose = FALSE, check_input = TRUE) {
 
   seeds_dim = dim(seeds)
   # input tests
@@ -124,9 +124,8 @@ p_value <- function(lower_bds, upper_bds, seeds, generating_fun, s_obs, theta_in
                method = "L-BFGS-B",
                lower = reduced_lower_bds,
                upper = reduced_upper_bds)
-  if (isTRUE(print_info)) {
-    print("opt result")
-    print(opt)
+  if (isTRUE(verbose)) {
+    message(opt$message)
   }
   m <- -opt$value
   theta_hat <- opt$par

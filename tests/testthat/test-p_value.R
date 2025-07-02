@@ -26,7 +26,7 @@ test_that("p_value: input checks work", {
   expect_error(p_value(lower_bds = c(0, 1),
                        upper_bds = c(1, 2, 3),
                        seeds = seeds,
-                       G = s_sample,
+                       generating_fun = s_sample,
                        s_obs = s_obs),
                "Lengths of inputs 'lower_bds' and 'upper_bds' must match.")
 
@@ -34,7 +34,7 @@ test_that("p_value: input checks work", {
   expect_error(p_value(lower_bds = c(0, 1),
                        upper_bds =c(2, 0),
                        seeds = seeds,
-                       G = s_sample,
+                       generating_fun = s_sample,
                        s_obs = s_obs),
                "'lower_bds' must be smaller than or equal to 'upper_bds' entry-wise.")
 
@@ -42,7 +42,7 @@ test_that("p_value: input checks work", {
   expect_error(p_value(lower_bds = lower_bds,
                        upper_bds = upper_bds,
                        seeds = array(rnorm(20), c(2, 2, 5)),
-                       G = s_sample,
+                       generating_fun = s_sample,
                        s_obs = s_obs),
                "'seeds' must be a 2-dimensional object")
 
@@ -50,25 +50,25 @@ test_that("p_value: input checks work", {
   expect_error(p_value(lower_bds = lower_bds,
                        upper_bds = upper_bds,
                        seeds = array(rep(NA, 20), c(4, 5)),
-                       G = s_sample,
+                       generating_fun = s_sample,
                        s_obs = s_obs),
                "'seeds' must be a numeric matrix or array without NA values.")
 
-  # 'G' is not a function
+  # 'generating_fun' is not a function
   expect_error(p_value(lower_bds = lower_bds,
                        upper_bds = upper_bds,
                        seeds = seeds,
-                       G = c(1,2),
+                       generating_fun = c(1,2),
                        s_obs = s_obs),
-               "'G' must be a function.")
+               "'generating_fun' must be a function.")
 
-  # 'G' is not a function with two inputs
+  # 'generating_fun' is not a function with two inputs
   expect_error(p_value(lower_bds = lower_bds,
                        upper_bds = upper_bds,
                        seeds = seeds,
-                       G = bad_G,
+                       generating_fun = bad_G,
                        s_obs = s_obs),
-               "'G' must be a function with exactly two inputs. The first one is a matrix or an array, the second one is a vector.")
+               "'generating_fun' must be a function with exactly two inputs. The first one is a matrix or an array, the second one is a vector.")
 })
 
 test_that("p_value example runs without error", {

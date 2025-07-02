@@ -13,17 +13,17 @@
 #' @param tol A numeric specifying the tolerance of the confidence interval.
 #' @param theta_init A vector specifying the starting point for the initial `optim` search.
 #' @param T_stat Default to the Mahalanobis distance. See Vignette for detailed explanation.
-#' @param print_info A Boolean variable indicating whether or not to print out the `optim` messages.
+#' @param verbose A Boolean variable indicating whether or not to print out the `optim` messages.
 #' @param check_input A Boolean variable indicating whether or not to run checks on the function inputs.
 #' @return A length-2 vector representing the obtained confidence interval. In the case when no point is accepted in the search space, return `NULL`.
 #' @examples
 #' ### Note that the examples may take a few seconds to run.
 #' ### Regular Normal
 #' set.seed(123)
-#' n <- 50 # sample size
-#' R <- 200 # Repro sample size
+#' n <- 30 # sample size
+#' R <- 50 # Repro sample size (should be at least 200 for accuracy in practice)
 #' alpha <- .05 # significance level
-#' tol <- 1e-2 # tolerance for the confidence set
+#' tol <- 0.01 # tolerance for the confidence set (use smaller tolerance in practice)
 #' s_obs <- c(1.12, 0.67) # the observed sample mean and variance
 #' seeds <- matrix(rnorm(R * (n + 2)), nrow = R, ncol = n + 2) # pre-generated seeds
 #'
@@ -51,7 +51,7 @@
 #' @export
 
 
-get_CI <- function(alpha, lower_bds, upper_bds, parameter_index, seeds, generating_fun, s_obs, tol, theta_init=NULL, T_stat=ma_depth, print_info=FALSE, check_input=TRUE) {
+get_CI <- function(alpha, lower_bds, upper_bds, parameter_index, seeds, generating_fun, s_obs, tol, theta_init=NULL, T_stat=ma_depth, verbose=FALSE, check_input=TRUE) {
   # parameter_index indicates which parameter we're computing the confidence interval for
   # tol represents the allowed tolerance on the boundary of our interval
   # T_stat is default to ma_depth as defined in the p_val file
@@ -65,12 +65,15 @@ get_CI <- function(alpha, lower_bds, upper_bds, parameter_index, seeds, generati
     } else if (!is.numeric(tol)) {
       stop("'tol' must be a positive number.")
     } else if (tol > 1) {
-      print("A large 'tol' might lead to inaccuracies in the result.")
+      warning("A large 'tol' might lead to inaccuracies in the result.")
     }
   }
 
   # use the p_value function to identify the best starting point for bisection, if there exits any
-  general_search <- p_value(lower_bds, upper_bds, seeds, generating_fun, s_obs, theta_init, T_stat, print_info, check_input)
+  if (isTRUE(verbose)) {
+    message("Initial search")
+  }
+  general_search <- p_value(lower_bds, upper_bds, seeds, generating_fun, s_obs, theta_init, T_stat, verbose, check_input)
 
   if (general_search$p_val > alpha) {
     # use the jth coordinate of theta_hat as the starting point for bisection
@@ -80,11 +83,9 @@ get_CI <- function(alpha, lower_bds, upper_bds, parameter_index, seeds, generati
     sub_search <- function(beta_left, beta_right, beta_init) {
 
       # print search information for tractability
-      if (isTRUE(print_info)) {
-        print('current bisection interval')
-        print(c(beta_left, beta_right))
-        print('search starting point')
-        print(beta_init)
+      if (isTRUE(verbose)) {
+        message("Current bisection interval: [", beta_left, ", ", beta_right, "]")
+        message("Search starting point: ", beta_init)
       }
 
       updated_lower <- lower_bds
@@ -95,7 +96,7 @@ get_CI <- function(alpha, lower_bds, upper_bds, parameter_index, seeds, generati
       # call the p_value function on the interval (beta_left, beta_right) with initial point
       initial_point <- (updated_lower + updated_upper) / 2
       initial_point[parameter_index] <- beta_init
-      return(p_value(updated_lower, updated_upper, seeds, generating_fun, s_obs, initial_point, T_stat, print_info, check_input=FALSE))
+      return(p_value(updated_lower, updated_upper, seeds, generating_fun, s_obs, initial_point, T_stat, verbose, check_input=FALSE))
     }
 
     # bisection to find the left boundary

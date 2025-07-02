@@ -32,20 +32,27 @@ as the gold standard for privacy protection, enabling the release of
 aggregated information while mathematically guaranteeing a quantifiable
 level of privacy at the individual level.
 
-Despite their benefits, DP mechanisms usually complicate the sampling
-distribution and introduce biases, making it hard to conduct statistical
-inferences. The `SimBaRepro` package addresses this challenge by
-leveraging the *repro samples* framework---a simulation-based approach
-to statistical inference. Unlike asymptotic methods, `SimBaRepro`
+Despite their benefits, DP mechanisms often complicate the sampling
+distributions and introduce biases, making it hard to conduct
+statistical inferences. The `SimBaRepro` package addresses this
+challenge by leveraging the *repro samples* framework---a
+simulation-based approach to statistical inference. Unlike asymptotic
+methods, which rely on large-sample approximations, `SimBaRepro`
 constructs confidence sets and hypothesis tests that are valid for
 finite samples while accounting for the known DP mechanism. Key
 functions include:
 
--   `p_value()`: Hypothesis testing for privatized data.\
--   `get_CI()`: Finite-sample confidence intervals.\
--   `confidence_grid()`: Multivariate confidence regions.\
--   `grid_projection()`: 2D confidence regions.
--   `plot_grid()`: Visualization of 2D confidence regions.
+-   `p_value()`: Perform hypothesis testing with
+    differentially-privatized data.\
+
+-   `get_CI()`: Generate finite-sample confidence intervals.\
+
+-   `confidence_grid()`: Find multivariate confidence regions.\
+
+-   `grid_projection()`: Project multivariate confidence regions to 2D
+    confidence regions.
+
+-   `plot_grid()`: Visualize 2D confidence regions with ggplot2.
 
 This package is based on the work of @Awan25.
 
@@ -68,29 +75,28 @@ $$s \,\mathbin{\overset{d}{=}}\, G(\theta^*,u),$$ arises from a known,
 deterministic mapping\
 $$G:\;\Theta\times\mathscr{U}\longrightarrow\mathscr{S},$$ together with
 a “seed”\
-$$u \sim P,$$ whose distribution $P$ does not depend on the the
-parameter $\theta^*$. Intuitively, $u$ captures all of the randomness in
-the data generation process (sampling noise, privacy noise, etc.), while
-$G$ describes how that randomness is transformed by the parameter
-$\theta^*$ into the observed summary statistic $s$.
+$$u \sim P,$$ whose distribution $P$ does not depend on the parameter
+$\theta^*$. Intuitively, $u$ captures all of the randomness in the data
+generation process (sampling noise, privacy noise, etc.), while $G$
+describes how that randomness is transformed by the parameter $\theta^*$
+into the observed summary statistic $s$.
 
 For example, if $X_1,...,X_R$ are sampled from $N(\mu^*,\sigma^{*2})$
 and $s=(X_1,...,X_R)$, we can take $$G(\theta^*, u)=\mu^*+\sigma^*u$$
-where $\theta^*=(\mu^*,\sigma^{*2})$ and $u\sim N(0,I_R)$. This works
-for more complicated cases, such as when DP mechanisms are used. Let
-$X_1,...,X_R$ be i.i.d. samples from $N(\mu^*,\sigma^{*2})$, and are
+where $\theta^*=(\mu^*,\sigma^{*2})$ and $u\sim N(0,I_R)$. This also
+applies to more complex settings, such as when DP mechanisms are used.
+Let $X_1,...,X_R$ be i.i.d. samples from $N(\mu^*,\sigma^{*2})$, and are
 clamped before adding an additional Laplace noise to obtain
 $\tilde{X}_1,...,\tilde{X}_R$. Let $\theta^*=(\mu^*,\sigma^{*2})$ be the
 true parameter, and let $u=(u_\text{data}, u_\text{DP})$ be the noise
-consisting of the data generating noise and DP mechanism noise. If we
-define:
+consisting of the data generating noise and DP mechanism noise. We can
+define the clamping function as:
 
 $$
-\text{clamp}[x]_a^b=\max\{a,\min\{b,x\}\},
+\text{clamp}[x]_a^b=\max\{a,\min\{b,x\}\}.
 $$
 
-then the generating equation for $(\tilde{X}_1,...,\tilde{X}_R)$ looks
-like
+In this case, the generation of privatized samples can be expressed as
 $$G(\theta^*,u)=\text{clamp}\left[\mu^*+\sigma^*u_\text{data}\right]_a^b+u_\text{DP},$$
 where the data noise $u_\text{data}$ is sampled from $N(0,I_R)$ and the
 privacy noise $u_\text{DP}$ is sampled from
@@ -104,8 +110,8 @@ seeds" $u_1,...,u_R\sim P$ and compute $$s_i(\theta)=G(\theta,u_i).$$
 At the true parameter $\theta^*$, $s_i(\theta^*)$ are i.i.d. with the
 same distribution as the observed $s$. We then compare the observed $s$
 to this "cluster" of simulated $\{s_i(\theta)\}_{i=1}^R$, with the
-intuition that close-to-true parameter should generate clusters that are
-"close" to $s$.
+intuition that parameters close to the truth should generate clusters
+that are "close" to $s$.
 
 ```{r, echo=FALSE, results='asis'}
 cat('
@@ -209,8 +215,8 @@ makes the observed statistic most "plausible" under simulated data.
     $0$ and $1$, where lower values correspond to "unusual" statistics.
     If not specified, this defaults to using the Mahalanobis distance.
 
--   **`print_info`**: An optional Boolean argument default to `FALSE`.
-    If `TRUE`, the function will print out the optim messages at each
+-   **`verbose`**: An optional Boolean argument default to `FALSE`. If
+    `TRUE`, the function will print out the optim messages at each
     searching step. This is useful when debugging.
 
 -   **`check_input`**: An optional Boolean argument default to `TRUE`.

@@ -20,9 +20,9 @@
 #' ### Regular normal
 #' set.seed(123)
 #' n <- 50 # sample size
-#' R <- 200 # Repro sample size
+#' R <- 50 # Repro sample size (should be at least 200 for accuracy in practice)
 #' alpha <- .05 # significance level
-#' tol <- 1e-2 # tolerance for the confidence set
+#' tol <- 0.01 # tolerance for the confidence set (use smaller tolerance in practice)
 #' s_obs <- c(1.12, 0.67) # the observed sample mean
 #' seeds <- matrix(rnorm(R * (n + 2)), nrow = R, ncol = n + 2) # pre-generated seeds
 #'
@@ -41,7 +41,7 @@
 #' lower_bds <- c(0.5, 0.3) # lower bounds for the parameter search region
 #' upper_bds <- c(1.5, 1.3) # upper bounds for the parameter search region
 #'
-#' resolution = 20  # resolution of the grid
+#' resolution = 10  # resolution of the grid
 #' result <- confidence_grid(alpha, lower_bds, upper_bds, seeds, s_sample, s_obs, tol, resolution)
 #' print(result$ind_array)
 #' print(result$search_lower_bds)
@@ -69,7 +69,7 @@ confidence_grid <- function(alpha, lower_bds, upper_bds, seeds, generating_fun, 
     } else {
       check_input <- FALSE
     }
-    confidence_interval <- get_CI(alpha, lower_bds, upper_bds, j, seeds, generating_fun, s_obs, tol, theta_init, T_stat, print_info = FALSE, check_input)
+    confidence_interval <- get_CI(alpha, lower_bds, upper_bds, j, seeds, generating_fun, s_obs, tol, theta_init, T_stat, verbose = FALSE, check_input)
     search_lower_bds[j] <- confidence_interval[1]
     search_upper_bds[j] <- confidence_interval[2]
   }
@@ -90,7 +90,7 @@ confidence_grid <- function(alpha, lower_bds, upper_bds, seeds, generating_fun, 
     cube_upper_bds <- cube_lower_bds + grid_width
     mid_point <- (cube_lower_bds + cube_upper_bds) / 2
 
-    if (p_value(cube_lower_bds, cube_upper_bds, seeds, generating_fun, s_obs, mid_point, T_stat, print_info = FALSE, check_input = FALSE)$p_val > alpha) {
+    if (p_value(cube_lower_bds, cube_upper_bds, seeds, generating_fun, s_obs, mid_point, T_stat, verbose = FALSE, check_input = FALSE)$p_val > alpha) {
       indicator_array <- do.call('[<-', c(list(indicator_array), as.list(indices), 1))
     }
 
@@ -162,7 +162,7 @@ grid_projection <- function(indicator_array, index_set) {
 #' ### Regular normal
 #' set.seed(123)
 #' n <- 50 # sample size
-#' R <- 200 # Repro sample size
+#' R <- 50 # Repro sample size (should be at least 200 for accuracy in practice)
 #' alpha <- .05 # significance level
 #' tol <- 1e-2 # tolerance for the confidence set
 #' s_obs <- c(1.12, 0.67) # the observed sample mean
@@ -183,7 +183,7 @@ grid_projection <- function(indicator_array, index_set) {
 #' lower_bds <- c(0.5, 0.4) # lower bounds for the parameter search region
 #' upper_bds <- c(1.5, 1.4) # upper bounds for the parameter search region
 #'
-#' resolution = 20  # resolution of the grid
+#' resolution = 10  # resolution of the grid
 #'
 #' result <- confidence_grid(alpha, lower_bds, upper_bds, seeds, s_sample, s_obs, tol, resolution)
 #' ind_arr <- result$ind_array

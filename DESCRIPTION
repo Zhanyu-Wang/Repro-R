@@ -1,20 +1,19 @@
 Package: SimBaRepro
 Title: Simulation-Based, Finite-Sample Inference via Repro Samples
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: 
 	c(
 		person(given = "Xinlong", family = "Du", , "du339@purdue.edu", role = c("aut", "cre")),
 		person(given = "Zhanyu", family = "Wang", , "zhanyu.wang.purdue@gmail.com", role = "aut"),
 		person(given = "Jordan", family = "Awan", , "jawan@purdue.edu", role = "aut")
 	)
-Description: This package includes functions for finding p-values (for hypothesis tests), confidence intervals, and multivariate confidence sets. In particular, the method is compatible with differentially private dataset, as long as the privacy mechanism is known. 
+Description: Functions for obtaining p-values (for hypothesis tests), confidence intervals, and multivariate confidence sets. In particular, the method is compatible with differentially private dataset, as long as the privacy mechanism is known. For more details, see Awan and Wang (2024), "Simulation-based, Finite-sample Inference for Privatized Data", <doi:10.48550/arXiv.2303.05328>.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports:
     ddalpha, ggplot2
-LazyData: true
 Suggests: 
     knitr,
     rmarkdown,
